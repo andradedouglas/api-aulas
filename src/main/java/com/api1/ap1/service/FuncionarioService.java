@@ -13,7 +13,7 @@ public class FuncionarioService {
 
 
     @Autowired //injeção de dependência
-    FuncionarioRepository funcionarioRepository;
+    private FuncionarioRepository funcionarioRepository;
 
     public Funcionario addFuncionario(Funcionario funcionario){
         return funcionarioRepository.save(funcionario); //insert no banco
@@ -23,6 +23,28 @@ public class FuncionarioService {
     }
     public Optional<Funcionario> buscarPorCpf(String cpf){
         return funcionarioRepository.findById(cpf);
+    }
 
+    public void deletar(String cpf){
+        Optional<Funcionario> funcionarioEncontrado = this.buscarPorCpf(cpf);
+        if (funcionarioEncontrado.isEmpty())
+            throw new RuntimeException("Funcionário não encontrado");
+        else
+            funcionarioRepository.deleteById(cpf);
+    }
+
+    public Funcionario atualizar(String cpf, String nome, Integer idade){
+        if (nome == null && idade == null)
+            throw new RuntimeException("Nenhum dado para atualizar");
+        Optional<Funcionario> funcionarioEncontrado = this.buscarPorCpf(cpf);
+        if (funcionarioEncontrado.isEmpty())
+            throw new RuntimeException("Funcionário não encontrado");
+        else {
+            Funcionario funcionario = funcionarioEncontrado.get();
+
+            if (nome != null) funcionario.setNome(nome);
+            if (idade != null) funcionario.setIdade(idade);
+            return funcionarioRepository.save(funcionario);
+        }
     }
 }
